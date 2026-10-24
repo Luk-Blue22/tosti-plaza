@@ -1,0 +1,82 @@
+/* Tosti Plaza - animaciones (solo CSS propio).
+   Todo cuelga de html.anim, que solo añade animations.js cuando el JS cargó,
+   no hay prefers-reduced-motion y la URL no trae ?captura=1.
+   Sin esa clase este archivo no hace nada (salvo html.captura). */
+
+/* Anclas suaves (respeta el scroll-margin-top del index) */
+html.anim { scroll-behavior: smooth; }
+
+/* Base: animación pausada hasta que el JS añada .is-in.
+   Solo opacity + translate + scale (propiedades individuales, no transform). */
+html.anim [data-anim] {
+  animation-name: anim-up;
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation-fill-mode: backwards;
+  animation-play-state: paused;
+  animation-delay: var(--anim-delay, 0ms);
+}
+html.anim [data-anim].is-in { animation-play-state: running; }
+html.anim [data-anim="title"] { animation-name: anim-title; animation-duration: 600ms; }
+html.anim [data-anim="star"] { animation-name: anim-star; animation-duration: 320ms; }
+/* Ya quedó por encima del viewport: se muestra al instante */
+html.anim [data-anim][data-anim-instant] { animation: none; }
+
+@keyframes anim-up {
+  from { opacity: 0; translate: 0 18px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes anim-title {
+  from { opacity: 0; translate: 0 24px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+@keyframes anim-star {
+  from { opacity: 0; scale: 0.6; }
+  to   { opacity: 1; scale: 1; }
+}
+
+/* Botones de WhatsApp / llamada: elevación leve y sombra suave (solo escritorio con puntero) */
+@media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  html.anim #desktop-root a[href^="https://wa.me/"]:not(.fixed),
+  html.anim #desktop-root a[href^="tel:"] {
+    transition-property: color, background-color, border-color, box-shadow, transform, translate, scale;
+  }
+  html.anim #desktop-root a[href^="https://wa.me/"]:not(.fixed):hover,
+  html.anim #desktop-root a[href^="tel:"]:hover {
+    translate: 0 -2px;
+    box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* Móvil: botón fijo de WhatsApp con pulso suave y lento, 3 ciclos */
+html.anim #mobile-root > a[aria-label="Pedir por WhatsApp"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(61, 226, 115, 0.6);
+  pointer-events: none;
+  animation: anim-ring 2.6s ease-out 3;
+  animation-fill-mode: backwards;
+}
+@keyframes anim-ring {
+  from { opacity: 0.7; scale: 1; }
+  to   { opacity: 0;   scale: 1.6; }
+}
+
+/* Reduce motion: todo desactivado */
+@media (prefers-reduced-motion: reduce) {
+  html.anim *, html.anim *::before, html.anim *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Modo captura (?captura=1): estado final, sin animaciones ni transiciones
+   (incluye animate-ping / animate-pulse / pulse-wa del diseño) */
+html.captura *, html.captura *::before, html.captura *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
